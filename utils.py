@@ -40,7 +40,6 @@ def create_data(N0, N1, C):
 
     # Assign toy conditions to the samples which play the role of some correlation-inducing factor 
     # Assume there are C distinct conditions
-    C = 10
     condlist = np.arange(C)
     conditions = np.random.choice(C, N)
 
