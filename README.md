@@ -29,7 +29,7 @@ Note that the algorithm above does not require running the system again for each
 The figure below illustrates the process.
 
 <div align="center">
-<img src="bootstrapping_process.jpg"  height="100">
+<img src="bootstrapping_process.jpg">
 </div>
   
 This same algorithm can be used to compute a distribution for the difference in performance between two systems by simply making the metric of interest in step 1 the difference between the metric when system A is applied to the bootstrap set and when system B is applied to that same set [Keller et al., 2005]. 
