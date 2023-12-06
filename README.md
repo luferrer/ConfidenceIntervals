@@ -24,11 +24,17 @@ The basic steps to compute confidence intervals based on the bootstrapping appro
 
 The resulting confidence interval provides an estimated range within which the system's performance will fall for $(100-\alpha)$% of the test datasets of size $N$ [Effron and Tibshirani, 1993]. The number of bootstrap samples should ideally be a few thousand to allow for a good precision when computing the confidence intervals for small $\alpha$ values.
 
+Note that the algorithm above does not require running the system again for each bootstrap sample. The system has to be run a single time on the full test set, saving its output for each sample. Then, the bootstrap sets are created by sampling those outputs which are all that is needed to compute the performance metric. The time needed to run bootstrapping for system evaluation is then given by the time it takes to compute the metric on a dataset of the size of the original set, times the number of bootstrap samples we want to use. 
+
+The figure below illustrates the process.
+
+<div align="center">
+<img src="bootstrapping_process.jpg"  height="100">
+</div>
+  
 This same algorithm can be used to compute a distribution for the difference in performance between two systems by simply making the metric of interest in step 1 the difference between the metric when system A is applied to the bootstrap set and when system B is applied to that same set [Keller et al., 2005]. 
 
 The algorithm above assumes that the samples in the test set are iid. If this is not the case, for example because samples come from human subjects that contributed several samples each, then this assumption does not hold. Luckily, it is easy to modify the bootstrapping algorithm to address this case [Poh and Bengio, 2007]. Basically, instead of sampling individual samples, we sample ``conditions'' (in the example, the condition would be the subject identifier). The bootstrap dataset is then created by including all the samples from each selected condition. If a condition was sampled $n$ times, we include each of its samples $n$ times. 
-
-Note that the algorithm above does not require running the system again for each bootstrap sample. The system has to be run a single time on the full test set, saving its output for each sample. Then, the bootstrap sets are created by sampling those outputs which are all that is needed to compute the performance metric. The time needed to run bootstrapping for system evaluation is then given by the time it takes to compute the metric on a dataset of the size of the original set, times the number of bootstrap samples we want to use. 
 
 The notebook provided with this repository includes python code to run bootstrapping as described above, including an option to provide the samples' conditions.
 
