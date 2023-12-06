@@ -29,11 +29,13 @@ class Bootstrap:
         self.y_pred = y_pred
         self.y_true = y_true
         self.conditions = conditions
+        self._indices = []
 
         vals = np.zeros(self.num_bootstraps)
         for i in range(self.num_bootstraps):
             sel_indices = get_bootstrap_indices(
                 len(self.y_pred), self.conditions, random_state=i)
+            self._indices.append(sel_indices)
             vals[i] = self.metric(
                 self.y_pred[sel_indices], self.y_true[sel_indices])
         self._scores = vals
@@ -47,7 +49,7 @@ class Bootstrap:
 
         low = np.percentile(self._scores, alpha/2)
         high = np.percentile(self._scores, 100-alpha/2)
-
+        self._ci = (low, high)
         if print_result:
             print(f"Confidence interval: {low:5.2f}  {high:5.2f}")
 
