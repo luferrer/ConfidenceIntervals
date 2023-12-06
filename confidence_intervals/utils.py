@@ -10,7 +10,7 @@ def get_conf_int(vals, alpha=5):
           (np.percentile(vals, alpha/2), np.percentile(vals, 100-alpha/2)))
 
 
-def create_data(N0, N1, C):
+def create_data(N0, N1, C, random_state=123456):
     """ Create a toy dataset for binary classification with N0 samples from class 0, N1 
      samples from class 1, and C conditions. 
     """
@@ -20,6 +20,7 @@ def create_data(N0, N1, C):
     # Assign toy conditions to the samples which play the role of some correlation-inducing factor
     # Assume there are C distinct conditions
     condlist = np.arange(C)
+    np.random.seed(random_state)
     conditions = np.random.choice(C, N)
 
     # Generate scores with Gaussian distribution centered at -1 for one class and at 1 for
