@@ -31,7 +31,7 @@ def read_requirements(path):
 
 setup(
     name="confidence_intervals",
-    version=read("project_name", "VERSION"),
+    version=read("VERSION"),
     description="project_description",
     url="https://github.com/luferrer/ConfidenceIntervals/",
     long_description=read("README.md"),
@@ -42,5 +42,5 @@ setup(
     entry_points={
         "console_scripts": ["project_name = project_name.__main__:main"]
     },
-    extras_require={"test": read_requirements("requirements-test.txt")},
+    # extras_require={"test": read_requirements("requirements-test.txt")},
 )
