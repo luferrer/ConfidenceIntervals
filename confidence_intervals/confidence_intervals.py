@@ -22,9 +22,38 @@ class Bootstrap:
 
         self.alpha = alpha
 
-    def fit(self, y_pred, y_true, conditions=None):
+    def fit(self, n_samples, conditions=None):
         """ Method to compute the confidence interval for the given metric
-        - metric: function that takes as input decisions, labels, and conditions and returns a scalar
+        - n_samples: number of samples in the original set
+        - conditions: integer array indicating the condition of each of those samples (in order)
+        """
+        self.conditions = conditions
+        self._indices = []
+
+        for i in range(self.num_bootstraps):
+            sel_indices = get_bootstrap_indices(
+                n_samples, self.conditions, random_state=i)
+            self._indices.append(sel_indices)
+
+    def transform(self, y_pred, y_true):
+        """ Method to compute the confidence interval for the given metric
+        - y_pred: array of decisions for each sample
+        - y_true: array of labels (0 or 1) for each sample
+        """
+        self.y_pred = y_pred
+        self.y_true = y_true
+
+        vals = np.zeros(self.num_bootstraps)
+        for i, indices in enumerate(self._indices):
+            vals[i] = self.metric(self.y_pred[indices], self.y_true[indices])
+        self._scores = vals
+        return vals
+
+    def fit_transform(self, y_pred, y_true, conditions=None):
+        """ Method to compute the confidence interval for the given metric
+        - y_pred: array of decisions for each sample
+        - y_true: array of labels (0 or 1) for each sample
+        - conditions: integer array indicating the condition of each sample (in order)
         """
         self.y_pred = y_pred
         self.y_true = y_true
