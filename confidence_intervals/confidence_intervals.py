@@ -25,7 +25,7 @@ def get_bootstrap_indices(N=None, conditions=None, random_state=None):
     return sel_indices
 
 
-def get_conf_int(values, alpha=5, print_result=False):
+def get_conf_int(values, alpha=5):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
         """
 
@@ -53,7 +53,7 @@ class Bootstrap:
         else:
             self.metric = metric
 
-    def fit(self, n_samples, conditions=None):
+    def get_list_of_bootstrap_indices(self, n_samples, conditions=None):
         """ Method to compute the confidence interval for the given metric
         - n_samples: number of samples in the original set
         - conditions: integer array indicating the condition of each of those samples (in order)
@@ -89,14 +89,12 @@ class Bootstrap:
         self.fit(len(y_pred), conditions)
         return self.transform(y_pred, y_true)
 
-    def get_conf_int(self, alpha=5):
+    
+    def get_conf_int(self, y_pred, y_true, conditions=None, alpha=5):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
         """
-
-        low = np.percentile(self._scores, alpha/2)
-        high = np.percentile(self._scores, 100-alpha/2)
-        self._ci = (low, high)
-
+        vals = self.fit_transform(y_pred, y_true, conditions)
+        self._ci = get_conf_int(vals, alpha)
         return self._ci
 
         
