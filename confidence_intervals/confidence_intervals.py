@@ -54,6 +54,7 @@ def evaluate_metric_with_conf_int(y_true, y_pred, metric, conditions=None, num_b
     
     return center, ci
 
+
 class Bootstrap:
 
     def __init__(self, num_bootstraps=1000, metric=None):
