@@ -85,21 +85,9 @@ class Bootstrap:
         - y_pred: array of decisions for each sample
         - y_true: array of labels (0 or 1) for each sample
         - conditions: integer array indicating the condition of each sample (in order)
-        """
-        self.y_pred = y_pred
-        self.y_true = y_true
-        self.conditions = conditions
-        self._indices = []
-
-        vals = np.zeros(self.num_bootstraps)
-        for i in range(self.num_bootstraps):
-            sel_indices = get_bootstrap_indices(
-                len(self.y_pred), self.conditions, random_state=i)
-            self._indices.append(sel_indices)
-            vals[i] = self.metric(
-                self.y_true[sel_indices], self.y_pred[sel_indices])
-        self._scores = vals
-        return vals
+        """        
+        self.fit(len(y_pred), conditions)
+        return self.transform(y_pred, y_true)
 
     def get_conf_int(self, alpha=5):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
