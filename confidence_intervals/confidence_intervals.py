@@ -35,6 +35,25 @@ def get_conf_int(values, alpha=5):
         return (low, high)
 
 
+def evaluate_metric_with_conf_int(y_true, y_pred, metric, conditions=None, num_bootstraps=1000, alpha=5):
+    """ Evaluate the metric on the provided data and then run bootstrapping to get a confidence interval.
+        - y_true: array of labels or any per-sample value needed to compute the metric
+        - y_pred: array of decisions/scores/losses for each sample needed to compute the metric
+        - metric: function that takes as input y_true and y_pred (or sampled versions of those inputs), 
+          and returns a scalar
+        - conditions: integer array indicating the condition of each sample (in the same order as
+          y_true and y_pred)
+        - num_bootstraps: number of bootstraps sets to create 
+        - alpha: confidence interval will be computed between alpha/2 and 100-alpha/2 percentiles
+    """
+
+    center = metric(y_true, y_pred)
+    
+    bt = Bootstrap(num_bootstraps, metric)
+    ci = bt.get_conf_int(y_pred, y_true, conditions, alpha=5)
+    
+    return center, ci
+
 class Bootstrap:
 
     def __init__(self, num_bootstraps=1000, metric=None):
@@ -66,7 +85,7 @@ class Bootstrap:
                 n_samples, self.conditions, random_state=i)
             self._indices.append(sel_indices)
 
-    def transform(self, y_pred, y_true):
+    def get_metric_values_for_bootstrap_sets(self, y_pred, y_true):
         """ Method to compute the confidence interval for the given metric
         - y_pred: array of decisions for each sample
         - y_true: array of labels (0 or 1) for each sample
@@ -80,20 +99,20 @@ class Bootstrap:
         self._scores = vals
         return vals
 
-    def fit_transform(self, y_pred, y_true, conditions=None):
+    def run(self, y_pred, y_true, conditions=None):
         """ Method to compute the confidence interval for the given metric
         - y_pred: array of decisions for each sample
         - y_true: array of labels (0 or 1) for each sample
         - conditions: integer array indicating the condition of each sample (in order)
         """        
-        self.fit(len(y_pred), conditions)
-        return self.transform(y_pred, y_true)
+        self.get_list_of_bootstrap_indices(len(y_pred), conditions)
+        return self.get_metric_values_for_bootstrap_sets(y_pred, y_true)
 
     
     def get_conf_int(self, y_pred, y_true, conditions=None, alpha=5):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
         """
-        vals = self.fit_transform(y_pred, y_true, conditions)
+        vals = self.run(y_pred, y_true, conditions)
         self._ci = get_conf_int(vals, alpha)
         return self._ci
 
