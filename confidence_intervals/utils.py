@@ -1,10 +1,5 @@
 import numpy as np
 
-def get_conf_int(vals, alpha=5):
-    """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
-    """
-    return (np.percentile(vals, alpha/2), np.percentile(vals, 100-alpha/2))
-
 
 def create_data(N0, N1, C, random_state=123456, scale=1.0):
     """ Create a toy dataset for binary classification with N0 samples from class 0, N1 
