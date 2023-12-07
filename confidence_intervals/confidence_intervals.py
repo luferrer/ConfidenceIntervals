@@ -23,10 +23,21 @@ def get_bootstrap_indices(N=None, conditions=None, random_state=None):
         sel_indices = resample(indices, replace=True,
                                n_samples=N, random_state=random_state)
     return sel_indices
-    
+
+
+def get_conf_int(values, alpha=5, print_result=False):
+        """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
+        """
+
+        low = np.percentile(values, alpha/2)
+        high = np.percentile(values, 100-alpha/2)
+        
+        return (low, high)
+
+
 class Bootstrap:
 
-    def __init__(self, num_bootstraps=1000, metric=None, alpha=5):
+    def __init__(self, num_bootstraps=1000, metric=None):
         """ Class to compute confidence intervals for a metric (e.g. accuracy) using bootstrapping
         - y_pred: array of decisions/scores/losses for each sample in the test dataset
         - y_true: array of labels or any additional value about each sample needed to compute the metric
@@ -41,8 +52,6 @@ class Bootstrap:
             self.metric = accuracy_score
         else:
             self.metric = metric
-
-        self.alpha = alpha
 
     def fit(self, n_samples, conditions=None):
         """ Method to compute the confidence interval for the given metric
@@ -92,18 +101,16 @@ class Bootstrap:
         self._scores = vals
         return vals
 
-    def get_conf_int(self, alpha=None, print_result=False):
+    def get_conf_int(self, alpha=5):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
         """
-        if alpha is None:
-            alpha = self.alpha
 
         low = np.percentile(self._scores, alpha/2)
         high = np.percentile(self._scores, 100-alpha/2)
         self._ci = (low, high)
-        if print_result:
-            print(f"Confidence interval: {low:5.2f}  {high:5.2f}")
 
-        return low, high
+        return self._ci
+
+        
 
 
