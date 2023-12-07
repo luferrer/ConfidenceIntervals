@@ -28,11 +28,12 @@ class Bootstrap:
 
     def __init__(self, num_bootstraps=1000, metric=None, alpha=5):
         """ Class to compute confidence intervals for a metric (e.g. accuracy) using bootstrapping
-        - y_pred: array of decisions for each sample
-        - y_true: array of labels (0 or 1) for each sample
+        - y_pred: array of decisions/scores/losses for each sample in the test dataset
+        - y_true: array of labels or any additional value about each sample needed to compute the metric
         - conditions: integer array indicating the condition of each sample (in order)
         - num_bootstraps: number of bootstraps to perform
-        - metric: function that takes as input decisions, labels, and conditions and returns a scalar
+        - metric: function that takes as input y_true and y_pred (or sampled versions of those inputs), 
+          and returns a scalar
         """
 
         self.num_bootstraps = num_bootstraps
@@ -87,7 +88,7 @@ class Bootstrap:
                 len(self.y_pred), self.conditions, random_state=i)
             self._indices.append(sel_indices)
             vals[i] = self.metric(
-                self.y_pred[sel_indices], self.y_true[sel_indices])
+                self.y_true[sel_indices], self.y_pred[sel_indices])
         self._scores = vals
         return vals
 
