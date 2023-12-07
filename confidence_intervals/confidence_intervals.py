@@ -3,6 +3,27 @@ from sklearn.utils import resample
 from sklearn.metrics import accuracy_score
 
 
+def get_bootstrap_indices(N=None, conditions=None, random_state=None):
+    """ Method that returns the indices for selecting a bootstrap set.
+    - num_samples: number of samples in the original set
+    - conditions: integer array indicating the condition of each of those samples (in order)
+    If conditions is None, the indices are obtained by sampling an array from 0 to N-1 with 
+    replacement. If conditions is not None, the indices are obtained by sampling conditions first
+    and then retrieving the sample indices corresponding to the selected conditions.
+    """
+
+    indices = np.arange(N)
+    if conditions is not None:
+        unique_conditions = np.unique(conditions)
+        bt_conditions = resample(unique_conditions, replace=True, n_samples=len(
+            unique_conditions), random_state=random_state)
+        sel_indices = np.concatenate(
+            [indices[np.where(conditions == s)[0]] for s in bt_conditions])
+    else:
+        sel_indices = resample(indices, replace=True,
+                               n_samples=N, random_state=random_state)
+    return sel_indices
+    
 class Bootstrap:
 
     def __init__(self, num_bootstraps=1000, metric=None, alpha=5):
@@ -85,23 +106,3 @@ class Bootstrap:
         return low, high
 
 
-def get_bootstrap_indices(N=None, conditions=None, random_state=None):
-    """ Method that returns the indices for selecting a bootstrap set.
-    - num_samples: number of samples in the original set
-    - conditions: integer array indicating the condition of each of those samples (in order)
-    If conditions is None, the indices are obtained by sampling an array from 0 to N-1 with 
-    replacement. If conditions is not None, the indices are obtained by sampling conditions first
-    and then retrieving the sample indices corresponding to the selected conditions.
-    """
-
-    indices = np.arange(N)
-    if conditions is not None:
-        unique_conditions = np.unique(conditions)
-        bt_conditions = resample(unique_conditions, replace=True, n_samples=len(
-            unique_conditions), random_state=random_state)
-        sel_indices = np.concatenate(
-            [indices[np.where(conditions == s)[0]] for s in bt_conditions])
-    else:
-        sel_indices = resample(indices, replace=True,
-                               n_samples=N, random_state=random_state)
-    return sel_indices

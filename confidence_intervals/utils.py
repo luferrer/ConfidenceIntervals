@@ -1,7 +1,4 @@
-
-
 import numpy as np
-
 
 def get_conf_int(vals, alpha=5):
     """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
