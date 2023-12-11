@@ -22,7 +22,7 @@ The basic steps to compute confidence intervals based on the bootstrapping appro
 2. Pool the $B$ metric values obtained above. We now have an empirical distribution of metric values.
 3. For a $\alpha$% confidence interval, compute the $\alpha/2$ and the $100-\alpha/2$ percentiles.
 
-The resulting confidence interval provides an estimated range within which the system's performance will fall for $(100-\alpha)$% of the test datasets of size $N$ [Effron and Tibshirani, 1993]. The number of bootstrap samples should ideally be a few thousand to allow for a good precision when computing the confidence intervals for small $\alpha$ values.
+The resulting confidence interval provides an estimated range within which the system's performance will fall for $(100-\alpha)$% of the test datasets of size $N$ [Effron and Tibshirani, 1993]. The number of bootstrap samples should ideally be a few thousand to allow for a good precision when computing the confidence intervals for small $\alpha$ values [Davison, 1997].
 
 Note that the algorithm above does not require running the system again for each bootstrap sample. The system has to be run a single time on the full test set, saving its output for each sample. Then, the bootstrap sets are created by sampling those outputs which are all that is needed to compute the performance metric. The time needed to run bootstrapping for system evaluation is then given by the time it takes to compute the metric on a dataset of the size of the original set, times the number of bootstrap samples we want to use. 
 
@@ -32,7 +32,7 @@ The figure below illustrates the process.
 <img src="bootstrapping_process.jpg">
 </div>
   
-This same algorithm can be used to compute a distribution for the difference in performance between two systems by simply making the metric of interest in step 1 the difference between the metric when system A is applied to the bootstrap set and when system B is applied to that same set [Keller et al., 2005]. 
+This same algorithm can be used to compute a distribution for the difference in performance between two systems by simply making the metric of interest in step 1 the difference between the metric when system A is applied to the bootstrap set and when system B is applied to that same set [Keller et al., 2005]. See the notebook for an example on how to use bootstrapping for this purpose.
 
 The algorithm above assumes that the samples in the test set are iid. If this is not the case, for example because samples come from human subjects that contributed several samples each, then this assumption does not hold. Luckily, it is easy to modify the bootstrapping algorithm to address this case [Poh and Bengio, 2007]. Basically, instead of sampling individual samples, we sample ``conditions'' (in the example, the condition would be the subject identifier). The bootstrap dataset is then created by including all the samples from each selected condition. If a condition was sampled $n$ times, we include each of its samples $n$ times. 
 
@@ -66,7 +66,10 @@ Hence, for a correct evaluation of performance, the test dataset should not have
 This document is a first attempt to provide easy-to-use code for obtaining some indication of the robustness of the conclusions obtained from empirical studies in machine learning. We welcome all contributions and suggestions for additions and corrections.
 
 ## References
-* **Bootstrapping in general**: B. Efron and R. Tibshirani. An Introduction to the Bootstrap. Monographs on statistics and applied probability, 1993 
+* **Bootstrapping in general**: 
+   * B. Efron and R. Tibshirani. An Introduction to the Bootstrap. Monographs on statistics and applied probability, 1993 
+   * A. C. Davison and D. V. Hinkley. Bootstrap methods and their application. Cambridge University Press, 1997.
+
 * **Bootstrapping for performance comparison**: Keller, Bengio, Wong, “Benchmarking Non-Parametric Statistical Tests”, in Proc. of Neural Information Processing Systems, 2005 
 * **Bootstrapping with non iid samples**: Poh and Bengio, “Estimating the Confidence Interval of Expected Performance Curve in Biometric Authentication Using Joint Bootstrap”, in Proc. of ICASSP, 2007 
 * **About system evaluation in general**: S. Raschka, “Model Evaluation, Model Selection, and Algorithm Selection in Machine Learning”, arXiv preprint arXiv:1811.12808, 2018
