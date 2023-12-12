@@ -1,6 +1,10 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
-  - family-names: Luciana
-    given-names: Ferrer
+  - family-names: Ferrer
+    given-names: Luciana
 title: "Confidence Intervals for evaluation in machine learning"
+
+identifiers:
+  - type: url
+    value: https://github.com/luferrer/ConfidenceIntervals
