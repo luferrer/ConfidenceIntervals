@@ -3,8 +3,7 @@ message: "If you use this software, please cite it as below."
 authors:
   - family-names: Ferrer
     given-names: Luciana
+  - family-names: Riera
+    given-names: Pablo
 title: "Confidence Intervals for evaluation in machine learning"
-
-identifiers:
-  - type: url
-    value: https://github.com/luferrer/ConfidenceIntervals
+url: https://github.com/luferrer/ConfidenceIntervals
