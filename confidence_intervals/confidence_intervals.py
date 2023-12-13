@@ -3,24 +3,59 @@ from sklearn.utils import resample
 from sklearn.metrics import accuracy_score
 
 
-def evaluate_with_conf_int(labels, samples, metric, conditions=None, num_bootstraps=1000, alpha=5):
-    """ Evaluate the metric on the provided data and then run bootstrapping to get a confidence interval.
-        - labels: array of labels or any per-sample value needed to compute the metric. 
-        - samples: array of decisions/scores/losses for each sample needed to compute the metric.
-        - metric: function that takes as arrays of labels and samples, and returns a scalar. 
-          If labels is None, the method is called only with samples.
-        - conditions: integer array indicating the condition of each sample (in the same order as
-          labels and samples)
-        - num_bootstraps: number of bootstraps sets to create 
-        - alpha: the confidence interval will be computed between alpha/2 and 100-alpha/2 percentiles
-    """
-    if labels is not None:
-        center = metric(labels, samples)
+def metric_wrapper(labels, samples, samples2, metric, indices=None):
+    """ Call the metric depending on which arguments are given and which are None. 
+    labels and samples2 may be None, samples and metric should always be given."""
+
+    if samples is None:
+        raise Exception("The samples argument cannot be None")
+
+    if indices is None:
+        l, s, s2 = labels, samples, samples2
     else:
-        center = metric(samples)
-    
+        l = labels[indices] if labels is not None else None
+        s = samples[indices]
+        s2 = samples2[indices] if samples2 is not None else None
+
+    if labels is not None:
+        if samples2 is not None:
+            return metric(l, s, s2)
+        else:
+            return metric(l, s)
+    else:
+        if samples2 is not None:
+            return metric(s, s2)
+        else:
+            return metric(s)
+
+
+def evaluate_with_conf_int(samples, metric, labels=None, conditions=None, num_bootstraps=1000, alpha=5, samples2=None):
+    """ Evaluate the metric on the provided data and then run bootstrapping to get a confidence interval.
+        
+        - samples: array of decisions/scores/losses for each sample needed to compute the metric.
+                
+        - metric: function that computes the metric given a set of samples. The function will be 
+          called internally as metric([labels], samples, [samples2]), where the two arguments in 
+          brackets are optional (if they are None, they are excluded from the call). 
+        
+        - labels: array of labels or any per-sample value needed to compute the metric. May be None
+          if the metric can be computed just with the values available in the samples array. 
+          Default=None.
+
+        - conditions: integer array indicating the condition of each sample (in the same order as
+          labels and samples). Default=None.
+        
+        - num_bootstraps: number of bootstraps sets to create. Default=1000.
+        
+        - alpha: the confidence interval will be computed between alpha/2 and 100-alpha/2 
+          percentiles. Default=5.
+        
+        - samples2: second set of samples for metrics that require an extra input. Default=None.
+    """    
+    center = metric_wrapper(labels, samples, samples2, metric)
+
     bt = Bootstrap(num_bootstraps, metric)
-    ci = bt.get_conf_int(samples, labels, conditions, alpha=alpha)
+    ci = bt.get_conf_int(samples, labels, conditions, alpha=alpha, samples2=samples2)
     
     return center, ci
 
@@ -97,7 +132,7 @@ class Bootstrap:
             sel_indices = get_bootstrap_indices(n_samples, self.conditions, random_state=i)
             self._indices.append(sel_indices)
 
-    def get_metric_values_for_bootstrap_sets(self, samples, labels):
+    def get_metric_values_for_bootstrap_sets(self, samples, labels, samples2=None):
         """ Method that computes the metric value for each bootstrap set in self._indices
         - samples: array of decisions/scores/losses for each sample
         - labels: array of labels or any other per-sample information needed to compute the metric 
@@ -105,31 +140,30 @@ class Bootstrap:
           input argument.
         """
         self.samples = samples
+        self.samples2 = samples2
         self.labels = labels
 
         vals = np.zeros(self.num_bootstraps)
         for i, indices in enumerate(self._indices):
-            if labels is not None:
-                vals[i] = self.metric(self.labels[indices], self.samples[indices])
-            else:
-                vals[i] = self.metric(self.samples[indices])
+            vals[i] = metric_wrapper(self.labels, self.samples, self.samples2, self.metric, indices)
+    
         self._scores = vals
         return vals
 
-    def run(self, samples, labels, conditions=None):
+    def run(self, samples, labels, conditions=None, samples2=None):
         """ Method to compute the confidence interval for the given metric
         - samples: array of decisions for each sample
         - labels: array of labels (0 or 1) for each sample
         - conditions: integer array indicating the condition of each sample (in order)
         """        
         self.get_bootstrap_sets(len(samples), conditions)
-        return self.get_metric_values_for_bootstrap_sets(samples, labels)
+        return self.get_metric_values_for_bootstrap_sets(samples, labels, samples2)
 
     
-    def get_conf_int(self, samples, labels, conditions=None, alpha=5):
+    def get_conf_int(self, samples, labels, conditions=None, alpha=5, samples2=None):
         """ Method to obtain the confidence interval from an array of metrics obtained from bootstrapping
         """
-        vals = self.run(samples, labels, conditions)
+        vals = self.run(samples, labels, conditions, samples2)
         self._ci = get_conf_int(vals, alpha)
         return self._ci
 
