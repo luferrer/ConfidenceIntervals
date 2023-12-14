@@ -51,6 +51,8 @@ def evaluate_with_conf_int(samples, metric, labels=None, conditions=None, num_bo
           percentiles. Default=5.
         
         - samples2: second set of samples for metrics that require an extra input. Default=None.
+
+        See https://github.com/luferrer/ConfidenceIntervals for more details. 
     """    
     center = metric_wrapper(labels, samples, samples2, metric)
 
