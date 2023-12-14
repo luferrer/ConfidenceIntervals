@@ -129,7 +129,7 @@ Note that the algorithm above does not require running the system again for each
 The figure below illustrates the process.
 
 <div align="center">
-<img src="bootstrapping_process.jpg">
+<img src="https://github.com/luferrer/ConfidenceIntervals/blob/main/bootstrapping_process.jpg">
 </div>
   
 This same algorithm can be used to compute a distribution for the difference in performance between two systems by simply making the metric of interest in step 1 the difference between the metric when system A is applied to the bootstrap set and when system B is applied to that same set.  **If the confidence interval does not include the value 0.0, then we can reject the null hypothesis that the two systems have the same performance [Keller, 2005].** See the notebook for an example on how to use bootstrapping for this purpose.
