@@ -18,7 +18,7 @@ This repository provides a simple implementation of the bootstrapping approach t
 
 # Installation
 
-```
+```bash
 pip install confidence_intervals
 ``````
 
@@ -28,7 +28,7 @@ Alternatively, if you need to change the code, you can clone this repository and
 
 Below is a quick way to test the code. For more details on usage, see the notebook.
 
-```
+```python
 # Import the main function 
 from confidence_intervals import evaluate_with_conf_int
 
@@ -46,7 +46,7 @@ evaluate_with_conf_int(samples, accuracy_score, labels, conditions, num_bootstra
 
 The code above produces the following output
 
-```
+```python
 (0.855, (0.7938131968651883, 0.9126023142471228))
 ```
 
